@@ -1,0 +1,13 @@
+# OS / editor cruft
+.DS_Store
+*.swp
+*~
+.idea/
+.vscode/
+
+# Never commit kubeconfigs or rendered manifests / secrets
+kubeconfig*
+*.kubeconfig
+rendered.yaml
+*-secret.yaml
+sealed-secret-key*

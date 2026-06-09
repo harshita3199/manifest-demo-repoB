@@ -1,0 +1,12 @@
+# Cap what a single preview namespace can consume so a runaway PR can't starve the cluster.
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: preview-quota
+spec:
+  hard:
+    requests.cpu: "1"
+    requests.memory: 512Mi
+    limits.cpu: "2"
+    limits.memory: 1Gi
+    pods: "10"

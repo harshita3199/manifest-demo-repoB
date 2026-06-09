@@ -1,0 +1,55 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: tess-pr-previews
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - pullRequest:
+        github:
+          owner: REPLACE-ME-OWNER       # GitHub owner of Repo A (the test app)
+          repo: REPLACE-ME-REPO-A       # Repo A name, e.g. tess-preview-app
+          # For a PUBLIC Repo A no token is required (anonymous API, ~60 req/hr).
+          # To lift the rate limit, create a read-only token Secret and uncomment:
+          # tokenRef:
+          #   secretName: github-readonly
+          #   key: token
+          labels:
+            - preview                    # GATE: only PRs carrying this label get an environment
+        requeueAfterSeconds: 60          # poll cadence
+  template:
+    metadata:
+      name: 'tess-pr-{{.number}}'
+    spec:
+      project: default
+      source:
+        # Manifests live in Repo B (this repo) — NOT in the PR branch.
+        # The PR's code is carried by the image tag below, not this revision.
+        repoURL: https://github.com/REPLACE-ME-OWNER/REPLACE-ME-REPO-B.git
+        targetRevision: main
+        path: overlays/preview
+        kustomize:
+          namespace: 'tess-pr-{{.number}}'
+          images:
+            # Must match what Repo A's Action pushed: <name>:<head-sha>.
+            - 'ghcr.io/REPLACE-ME-OWNER/tess-preview-app:{{.head_sha}}'
+          patches:
+            - target:
+                kind: Ingress
+                name: tess
+              patch: |-
+                - op: replace
+                  path: /spec/rules/0/host
+                  value: 'pr-{{.number}}.preview.tess.local'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: 'tess-pr-{{.number}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - PrunePropagationPolicy=foreground

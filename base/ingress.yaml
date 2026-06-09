@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tess
+spec:
+  ingressClassName: nginx
+  rules:
+    # Host is a placeholder; the ApplicationSet replaces it per-PR with
+    # pr-<N>.preview.tess.local (see applicationset.yaml patches).
+    - host: pr-PLACEHOLDER.preview.tess.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: tess
+                port:
+                  number: 80

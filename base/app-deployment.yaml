@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tess
+  labels:
+    app: tess
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tess
+  template:
+    metadata:
+      labels:
+        app: tess
+    spec:
+      containers:
+        - name: app
+          # Matched by base/kustomization.yaml `images:` and overridden per-PR by the ApplicationSet.
+          image: tess-preview-app
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "250m"
+              memory: "128Mi"
