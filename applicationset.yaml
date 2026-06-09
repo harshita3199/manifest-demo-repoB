@@ -9,8 +9,8 @@ spec:
   generators:
     - pullRequest:
         github:
-          owner: REPLACE-ME-OWNER       # GitHub owner of Repo A (the test app)
-          repo: REPLACE-ME-REPO-A       # Repo A name, e.g. tess-preview-app
+          owner: harshita3199       # GitHub owner of Repo A (the test app)
+          repo: kind-demo-repo       # Repo A name, e.g. tess-preview-app
           # For a PUBLIC Repo A no token is required (anonymous API, ~60 req/hr).
           # To lift the rate limit, create a read-only token Secret and uncomment:
           # tokenRef:
@@ -27,14 +27,14 @@ spec:
       source:
         # Manifests live in Repo B (this repo) — NOT in the PR branch.
         # The PR's code is carried by the image tag below, not this revision.
-        repoURL: https://github.com/REPLACE-ME-OWNER/REPLACE-ME-REPO-B.git
-        targetRevision: main
+        repoURL: https://github.com/harshita3199/manifest-demo-repoB.git
+        targetRevision: master
         path: overlays/preview
         kustomize:
           namespace: 'tess-pr-{{.number}}'
           images:
             # Must match what Repo A's Action pushed: <name>:<head-sha>.
-            - 'ghcr.io/REPLACE-ME-OWNER/tess-preview-app:{{.head_sha}}'
+            - 'ghcr.io/harshita3199/tess-preview-app:{{.head_sha}}'
           patches:
             - target:
                 kind: Ingress

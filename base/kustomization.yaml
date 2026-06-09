@@ -11,5 +11,5 @@ resources:
 # `name: tess-preview-app` is the logical name matched in app-deployment.yaml.
 images:
   - name: tess-preview-app
-    newName: ghcr.io/REPLACE-ME-OWNER/tess-preview-app
+    newName: ghcr.io/harshita3199/tess-preview-app
     newTag: latest
