@@ -21,7 +21,10 @@ kubectl -n ingress-nginx rollout status deploy/ingress-nginx-controller --timeou
 
 echo "==> install Argo CD"
 kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+# --server-side avoids the "metadata.annotations: Too long" failure on the large
+# ApplicationSet CRD (client-side apply can't store its last-applied annotation).
+kubectl apply -n argocd --server-side --force-conflicts \
+  -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 echo "    waiting for the ApplicationSet controller..."
 kubectl -n argocd rollout status deploy/argocd-applicationset-controller --timeout=300s
 
